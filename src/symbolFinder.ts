@@ -19,7 +19,7 @@ async function _findSymbol(
             const newSymbolInfos = await listSymbols(classNameFilter);
             symbolPicker.items = newSymbolInfos.map((symbol) => ({
                 label: `$(symbol-class) ${symbol.name}`,
-                description: `${symbol.containerName}.${symbol.name}`,
+                description: `${symbol.containerName} · ${symbol.location.uri.fsPath}`,
                 symbol,
             }));
         });

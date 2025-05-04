@@ -28,11 +28,7 @@ export function generateMock(
             return;
         }
 
-        const jarPath = path.join(
-            context.extensionPath,
-            "src",
-            "mockgen-1.0-SNAPSHOT.jar"
-        );
+        const jarPath = path.join(context.extensionPath, "src", "mockgen.jar");
         const classPath = `${symbol.containerName}.${symbol.name}`;
         const command = `java -jar "${jarPath}" ${vscode.workspace.workspaceFolders[0].uri.path} ${classPath} `;
 
