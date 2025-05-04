@@ -15,11 +15,7 @@
     "commands": [
       {
         "command": "vinimockgen.generateMock",
-        "title": "Generates a mock for the specified class."
-      },
-      {
-        "command": "vinimockgen.aaa",
-        "title": "Maluquice."
+        "title": "[ViniMockGen] Generates a mock for the specified class."
       }
     ]
   },

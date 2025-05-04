@@ -5,25 +5,53 @@ import * as vscode from "vscode";
 var suggestionProvider: vscode.Disposable;
 
 // java -jar target/mockgen-1.0-SNAPSHOT.jar  ~/proj/extensao/mockgen br.com.vinimockgen.presentation.classes.financial.Portfolio
-export function generateMock(context: vscode.ExtensionContext) {
+export function generateMock(
+    context: vscode.ExtensionContext,
+    outputChanel: vscode.OutputChannel
+) {
     return async () => {
+        const symbol: vscode.SymbolInformation | null =
+            await vscode.commands.executeCommand(
+                "vinimockgen.listWorkspaceSymbols"
+            );
+
+        outputChanel.appendLine(
+            `[INFO] Selected symbol: ${JSON.stringify(symbol)}`
+        );
+
+        if (symbol === null) {
+            return;
+        }
+
+        if (vscode.workspace.workspaceFolders === undefined) {
+            outputChanel.appendLine(`[DEBUG] No workspace open.`);
+            return;
+        }
+
         const jarPath = path.join(
             context.extensionPath,
             "src",
             "mockgen-1.0-SNAPSHOT.jar"
         );
-        const command = `java -jar "${jarPath}" ~/proj/extensao/mockgen br.com.vinimockgen.presentation.classes.financial.Portfolio`;
+        const classPath = `${symbol.containerName}.${symbol.name}`;
+        const command = `java -jar "${jarPath}" ${vscode.workspace.workspaceFolders[0].uri.path} ${classPath} `;
+
+        outputChanel.appendLine(`[INFO] JAR Command: ${command}`);
 
         exec(command, async (error, stdout, stderr) => {
             if (error) {
                 vscode.window.showErrorMessage(
                     `Error generating mock: ${stderr}`
                 );
+                outputChanel.appendLine(
+                    `[ERROR]: Error generating mock: ${stderr}`
+                );
                 return;
             }
 
             const editor = vscode.window.activeTextEditor;
             if (!editor) {
+                vscode.window.showErrorMessage(`Text editor not activated.`);
                 return;
             }
 
@@ -48,8 +76,8 @@ export function generateMock(context: vscode.ExtensionContext) {
 
                             item.command = {
                                 command: "vinimockgen.insertFullMock",
-                                title: "Insert full mock suggestion",
-                                arguments: [position, slicedSuggestion, stdout],
+                                title: "Insert full mock suggestion on code editor",
+                                arguments: [position, stdout],
                             };
 
                             return [item];
@@ -67,8 +95,7 @@ export function generateMock(context: vscode.ExtensionContext) {
 }
 
 export async function insertFullText(
-    position: vscode.Position,
-    preview: string,
+    startPosition: vscode.Position,
     originalText: string
 ) {
     const editor = vscode.window.activeTextEditor;
@@ -76,12 +103,9 @@ export async function insertFullText(
         return;
     }
 
-    const numBreakLines = (preview.match("\n") || []).length;
-
     await editor.edit((editBuilder) => {
         const end = editor.selection.active;
-        const start = new vscode.Position(end.line - numBreakLines, 0);
-        editBuilder.replace(new vscode.Range(position, end), originalText);
+        editBuilder.replace(new vscode.Range(startPosition, end), originalText);
     });
 
     suggestionProvider.dispose();
