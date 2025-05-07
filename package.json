@@ -1,8 +1,11 @@
 {
+  "repository": "https://github.com/vinciusb/vinimockgen",
   "name": "vinimockgen",
   "displayName": "viniMockGen",
   "description": "A mock generator for the Java language created by Vinicius Braga Freire.",
-  "version": "0.0.1",
+  "icon": "media/img/viniMockGen.JPG",
+  "publisher": "ViniciusBragaFreire",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.99.0"
   },

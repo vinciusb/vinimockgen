@@ -3,6 +3,7 @@ import { generateMock, insertFullText } from "./generateMock";
 import { findSymbol } from "./symbolFinder";
 
 export function activate(context: vscode.ExtensionContext) {
+    // TODO: Mudar isso de lugar
     const outputChannel = vscode.window.createOutputChannel("viniMockGen");
     outputChannel.appendLine("[INFO] Starting viniMockGen extension...");
 
